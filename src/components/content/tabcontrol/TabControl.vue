@@ -27,7 +27,9 @@
 	  },
 	  methods:{
 	  	tabControl(index){
-	  		this.currentIndex = index
+	  		this.currentIndex = index;
+	  		this.$emit('tabClick', index) 
+	  		/*这里将点击事件传到父组件中，监听index值，tabClick是自定义的方法*/
 	  	}
 	  }
 	}
