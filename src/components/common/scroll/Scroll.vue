@@ -7,7 +7,7 @@
 </template>
 
 <script>
-	import BScroll from 'better-scroll'
+	import scroll from 'better-scroll'
 
 	export default {
 	  name: 'Scroll',
@@ -23,12 +23,12 @@
 	  },
 	  data(){
 	  	return{
-	  		bscroll: null
+	  		scroll: null
 	  	}
 	  },
 	  mounted(){
-	  	    // 1.创建BScroll对象
-  			this.bscroll = new BScroll(this.$refs.wrapper,{	  			
+	  	    // 1.创建scroll对象
+  			this.scroll = new scroll(this.$refs.wrapper,{	  			
 		  		click: true,
 		  		/*
 					probeType 的几个数值：
@@ -42,24 +42,29 @@
 	     	})
 
 	     	// 2.侦测滚动实时位置
-			this.bscroll.on('scroll',(position)=>{
+			this.scroll.on('scroll',(position)=>{
 			 	this.$emit('scroll', position)
 			}) 
 
 			// 3.监听上拉事件 滚动到底部
 			if(this.pullUpLoad){
-				this.bscroll.on('pullingUp',()=>{	
+				this.scroll.on('pullingUp',()=>{	
 					this.$emit('pullingup')
 				})
 			}
 	  
 	  },
 	  methods: {
+	  
 	  	finishPullUp(){
-	  		this.bscroll && this.bscroll.finishPullUp()
+	  		this.scroll && this.scroll.finishPullUp()
 	  	},
 	  	refresh(){
-	  		this.bscroll && this.bscroll.refresh()
+	  		this.scroll && this.scroll.refresh()
+	  	},
+	  	getScrollY(){
+	  		//将滚动的y值返回
+	  		return this.scroll ? this.scroll.y : 0
 	  	}
 	  }
 	}

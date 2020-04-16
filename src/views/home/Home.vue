@@ -3,17 +3,24 @@
    	 <nav-bar class="home-nav">
    	 	<div slot="center">购物街</div>   	 	
    	 </nav-bar>
-
+     <tab-control :titles="['流行','新款','精选']" 
+                      @tabClick="tabClick" 
+                      ref="tabcontrol1"
+                      class="tabcontrol"
+                      v-show="isTabFixed" />
    	<scroll class="content" 
               ref="scroll" 
               :probe-type="3"  
               @scroll="contentScroll" 
               :pull-up-load="true"
               @pullingup="loadMore">
-         <home-swiper :banners="banners"/>
+         <home-swiper :banners="banners" 
+                      @swiperImageLoad="swiperImageLoad"/>
          <recommend-view :recommends="recommends"/>
          <feature />
-         <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick" class="tab-control"/>
+         <tab-control :titles="['流行','新款','精选']" 
+                      @tabClick="tabClick" 
+                      ref="tabcontrol2" />
          <goods-list :goods="goods[currentType].list" />  
       </scroll>
    	<back-top @click.native="backTop" v-show="isShowBackTop"/>
@@ -56,9 +63,29 @@
             'sell':{page:0, list:[]},
          },
          currentType: 'pop',//点击类型，默认是pop
-         isShowBackTop: false
+         isShowBackTop: false,
+         tabcontrolOffset: 0,
+         isTabFixed: false,
+         saveY: 0  //记录离开之前的滚动y值
 	  	}
 	  },
+    computed:{
+      showGoods(){
+        return this.goods[this.currentType].list
+      }
+    },
+    activated(){
+      //获取离开之前的位置，状态信息
+      // 并且，滚动到该位置,scroll的方法最好不要多封装了，容易报错
+      //要先刷新，再滚动，否则会回弹到顶部
+      this.$refs.scroll.refresh()
+      this.$refs.scroll.scroll.scrollTo(0,this.saveY)
+    },
+    deactivated(){
+      //记录离开时的信息，获取到scroll的滚动y值
+      this.saveY = this.$refs.scroll.scroll.y
+      //console.log(this.saveY)
+    },
 	  created(){
         // 请求多个数据
 	     this.getHomeMultidata()
@@ -81,7 +108,7 @@
           refresh()
         })
     },
-     methods:{
+    methods:{
          /*监听点击事件方法*/
          tabClick(index){
           //监听到子组件的点击事件，切换index
@@ -96,24 +123,32 @@
                this.currentType = 'sell';
                break;
           }
+          //tab被点击以后，同步更新两个tab-control的currentIndex
+          this.$refs.tabcontrol1.currentIndex = index
+          this.$refs.tabcontrol2.currentIndex = index
          },
          /*回到顶部*/
          backTop(){
             // scroll中有一个scrollTo()方法，其中有3个参数
             // x,y,毫秒
             //获取到当前的组件 $refs ，拿到组件内部的scroll对象，调用它的scrollTo方法
-            this.$refs.scroll.bscroll.scrollTo(0,0,500)
+            this.$refs.scroll.scroll.scrollTo(0,0,500)
          },
          /*监听scroll滚动的值*/
          contentScroll(position){
             //当滚动的y达到1000的时候，isShowBackTop 为true
             this.isShowBackTop = (-position.y) > 1000 
+            //当滚动的y达到tabcontrolOffset的值，isTabFixed 为true
+            this.isTabFixed = (-position.y) > this.tabcontrolOffset
          },
          /*上拉加载更多*/
          loadMore(){
            this.getHomeGoods(this.currentType) //加载更多商品，调用getHomeGoods         
          },
-
+         // 监听swiper图片加载完成，判断tab-control的offsetTop的值
+         swiperImageLoad(){
+          this.tabcontrolOffset = this.$refs.tabcontrol2.$el.offsetTop
+         },
          /*以下是网络请求方法*/
          getHomeMultidata(){
            getHomeMultidata().then(res =>{
@@ -132,7 +167,7 @@
                this.$refs.scroll.finishPullUp()
             })
          }
-     }
+    }
 	}
 </script>
 
@@ -155,11 +190,10 @@
 	.home-swiper{
 		padding-top:44px;
 	}
-	.tab-control{
-		position: sticky;
-		top:44px;
-      z-index:9;
-	}
+  .tabcontrol{
+    position: relative;
+    z-index: 9
+  }
    .content{
       position: absolute;
       top:44px;

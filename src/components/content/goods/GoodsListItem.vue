@@ -1,6 +1,9 @@
 <template>
 	<div class="goodsItem">		 	
-	 	<img :src="goodsItem.show.img" alt="" @load="imgLoad">
+	 	<img :src="goodsItem.show.img" 
+	 	     alt="" 
+	 	     @load="imgLoad" 
+	 	     @click="itemClick">
 	 	<div class="goods-info">
 	 		<p>{{goodsItem.title}}</p>
 	 		<span class="price">{{goodsItem.price}}</span>
@@ -25,7 +28,11 @@
 	  	//监听每一张图片加载完成，发射方法，在vue中监听
 	  	imgLoad(){
 	  		this.$bus.$emit('imgLoad')
+	  	},
+	  	itemClick(){
+	  		this.$router.push('/detail/'+ this.goodsItem.iid)
 	  	}
+
 	  }
 	 
 	}
