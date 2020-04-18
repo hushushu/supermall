@@ -1,6 +1,6 @@
 <template>
 	<div class="goodsItem">		 	
-	 	<img :src="goodsItem.show.img" 
+	 	<img :src="showImage"
 	 	     alt="" 
 	 	     @load="imgLoad" 
 	 	     @click="itemClick">
@@ -23,6 +23,11 @@
 	  		}
 	  	}
 	  },
+    computed:{
+	    showImage(){
+	      return this.goodsItem.image || this.goodsItem.show.img
+      }
+    },
 	  methods:{
 	  	//@load="imgLoad" 是vue中的监听图片加载完成的方法
 	  	//监听每一张图片加载完成，发射方法，在vue中监听

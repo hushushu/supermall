@@ -61,7 +61,7 @@
 	  	},
 	  	refresh(){
 	  		this.scroll && this.scroll.refresh()
-	  	},
+      },
 	  	getScrollY(){
 	  		//将滚动的y值返回
 	  		return this.scroll ? this.scroll.y : 0

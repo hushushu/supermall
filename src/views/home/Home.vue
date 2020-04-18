@@ -40,8 +40,9 @@
 
 	import {getHomeMultidata, getHomeGoods} from 'network/home'
   import {debounce} from 'common/utils'
+  import {itemListenerMixin} from "common/mixin";
 
-	export default {
+  export default {
 	  name: 'Home',
 	  components:{
 	  	 NavBar,
@@ -82,9 +83,10 @@
       this.$refs.scroll.scroll.scrollTo(0,this.saveY)
     },
     deactivated(){
-      //记录离开时的信息，获取到scroll的滚动y值
+      //1.记录离开时的信息，获取到scroll的滚动y值
       this.saveY = this.$refs.scroll.scroll.y
-      //console.log(this.saveY)
+      //2.取消监听全局事件
+      this.$bus.$off('imgLoad', this.itemImgListener)
     },
 	  created(){
         // 请求多个数据
@@ -95,19 +97,9 @@
         this.getHomeGoods('sell') 
 	  },
     mounted(){
-        //监听图片加载完成，避免卡顿现象
-        /*使用 ‘事件总线’的处理方法
-        给$bus赋值vue实例，确保在任意地方都可以调用
-        Vue.prototype.$bus = new Vue()
-        在goodsitem.vue中发射事件 this.$bus.$emit('事件名')，然后在home.vue中监听
-        this.$bus.$on('事件名')*/
-
-       //将 debounce 函数封装在util.js中 （防抖函数，延迟刷新）
-        const refresh = debounce(this.$refs.scroll.refresh, 50)
-        this.$bus.$on('imgLoad',()=>{
-          refresh()
-        })
+        //这里的内容使用了混入 mixin 在common/minxin.js中查看
     },
+    mixins:[itemListenerMixin],
     methods:{
          /*监听点击事件方法*/
          tabClick(index){
