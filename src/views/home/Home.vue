@@ -36,11 +36,10 @@
 	import TabControl from 'components/content/tabcontrol/TabControl'
    import GoodsList from 'components/content/goods/GoodsList'
    import Scroll from 'components/common/scroll/Scroll'
-   import BackTop from 'components/content/backTop/BackTop'
 
 	import {getHomeMultidata, getHomeGoods} from 'network/home'
   import {debounce} from 'common/utils'
-  import {itemListenerMixin} from "common/mixin";
+  import {itemListenerMixin, backTopMixin} from "common/mixin";
 
   export default {
 	  name: 'Home',
@@ -51,8 +50,7 @@
 	    Feature,
 	    TabControl,
        GoodsList,
-       Scroll,
-       BackTop
+       Scroll
 	  },
 	  data(){
 	  	return{
@@ -64,7 +62,6 @@
             'sell':{page:0, list:[]},
          },
          currentType: 'pop',//点击类型，默认是pop
-         isShowBackTop: false,
          tabcontrolOffset: 0,
          isTabFixed: false,
          saveY: 0  //记录离开之前的滚动y值
@@ -99,7 +96,7 @@
     mounted(){
         //这里的内容使用了混入 mixin 在common/minxin.js中查看
     },
-    mixins:[itemListenerMixin],
+    mixins:[itemListenerMixin, backTopMixin],
     methods:{
          /*监听点击事件方法*/
          tabClick(index){
@@ -119,17 +116,9 @@
           this.$refs.tabcontrol1.currentIndex = index
           this.$refs.tabcontrol2.currentIndex = index
          },
-         /*回到顶部*/
-         backTop(){
-            // scroll中有一个scrollTo()方法，其中有3个参数
-            // x,y,毫秒
-            //获取到当前的组件 $refs ，拿到组件内部的scroll对象，调用它的scrollTo方法
-            this.$refs.scroll.scroll.scrollTo(0,0,500)
-         },
          /*监听scroll滚动的值*/
          contentScroll(position){
-            //当滚动的y达到1000的时候，isShowBackTop 为true
-            this.isShowBackTop = (-position.y) > 1000 
+           this.listenShowBackTop(position)
             //当滚动的y达到tabcontrolOffset的值，isTabFixed 为true
             this.isTabFixed = (-position.y) > this.tabcontrolOffset
          },

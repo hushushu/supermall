@@ -1,4 +1,5 @@
 import {debounce} from "./utils";
+import BackTop from 'components/content/backTop/BackTop'
 
 export const itemListenerMixin = {
   data(){
@@ -21,7 +22,32 @@ export const itemListenerMixin = {
       this.refresh()
     }
     this.$bus.$on('imgLoad', this.itemImgListener)
-    console.log('我是混入中的内容');
+    //console.log('我是混入中的内容');
   }
+}
+
+export const backTopMixin = {
+  components:{
+    BackTop
+  },
+  data() {
+    return{
+      isShowBackTop: false
+    }
+  },
+  methods:{
+    /*回到顶部*/
+    backTop(){
+      // scroll中有一个scrollTo()方法，其中有3个参数
+      // x,y,毫秒
+      //获取到当前的组件 $refs ，拿到组件内部的scroll对象，调用它的scrollTo方法
+      this.$refs.scroll.scroll.scrollTo(0,0,500)
+    },
+    listenShowBackTop(position){
+      //当滚动的y达到1000的时候，isShowBackTop 为true
+      this.isShowBackTop = (-position.y) > 1000
+    }
+  }
+
 
 }
