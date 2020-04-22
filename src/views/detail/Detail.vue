@@ -14,7 +14,7 @@
 	   		<detail-comment-info :comment-info="commentInfo" ref="comment"/>
         <goods-list :goods="recommends" ref="recommend"/>
    		</scroll>
-     <detail-bottom-bar />
+     <detail-bottom-bar @carClick="addTocart" />
      <back-top @click.native="backTop" v-show="isShowBackTop"/>
    </div>
 </template>
@@ -35,6 +35,8 @@
 	import {getDetail, Goods, Shop, GoodsParam, getRecommend} from 'network/detail'
   import {debounce} from "common/utils";
 	import {itemListenerMixin, backTopMixin} from "common/mixin";
+
+	import { mapActions } from 'vuex'
 
 
   export default {
@@ -71,7 +73,7 @@
 	  	this.id = this.$route.params.iid
 	  	//2.获取数据
 	  	getDetail(this.id).then(res=>{
-	  	//	console.log(res)
+	  	  console.log(res)
 	  		const data = res.result
 
 	  		//1.获取顶部轮播信息数据
@@ -120,6 +122,7 @@
     },
     mixins:[itemListenerMixin, backTopMixin],
 	  methods:{
+	    ...mapActions(['addCart']),
 	  	imgLoad(){
 	  		this.refresh()
         this.getThemeTopYs() //执行图片防抖，并且给themeTopYs赋值
@@ -145,6 +148,31 @@
         }
       // 是否显示回到顶部
         this.listenShowBackTop(position)
+      },
+      addTocart(){
+	      //1.获取购物车需要展示的信息
+	  	  const product = {}
+	  	  product.image = this.topImages[0];
+	  	  product.title = this.goods.title;
+	  	  product.desc = this.goods.desc;
+	  	  product.newPrice = this.goods.nowPrice;
+	  	  product.iid = this.id;
+
+        //console.log(product);
+        //2.将商品添加到购物车里 (1.Promise 2.mapActions)
+        //这里需要用到vuex，将数据保存在state中，然后再在购物车中取出
+        //this.$store.commit('addCart', product) //提交到mutations中
+        //提交到actions中派发事件，使得mutations中只做简单的状态判断，不过多处理事件
+        //使用promise返回值，做成功回调
+        /*this.$store.dispatch('addCart', product).then(res =>{
+            console.log(res)
+        })*/
+        //使用mapActions映射
+        this.addCart(product).then(res =>{
+          console.log(res)
+        })
+
+
       }
 	  }
 	}
