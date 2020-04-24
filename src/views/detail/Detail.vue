@@ -37,6 +37,7 @@
 	import {itemListenerMixin, backTopMixin} from "common/mixin";
 
 	import { mapActions } from 'vuex'
+  import Toast from "../../components/common/toast/Toast";
 
 
   export default {
@@ -169,7 +170,8 @@
         })*/
         //使用mapActions映射
         this.addCart(product).then(res =>{
-          console.log(res)
+         // console.log(res)
+          this.$toast.show(res, 1500)
         })
 
 

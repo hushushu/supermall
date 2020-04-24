@@ -3,7 +3,7 @@
     <CheckButton class="select-all" :is-checked="isSelectAll" @click.native="allChecked"></CheckButton>
     <span>全选</span>
     <span class="total-price">合计: ¥{{totalPrice}}</span>
-    <span class="buy-product">去计算({{checkLength}})</span>
+    <span class="buy-product" @click="calcClick">去计算({{checkLength}})</span>
   </div>
 </template>
 
@@ -49,7 +49,14 @@
           // 部分没有选中/全部都没有选中 ，取反
           this.cartList.forEach(item => item.checked = true)
         }
+      },
+      calcClick(){
+        //结算，如果没有选中的商品
+        if (!this.isSelectAll) {
+          this.$toast.show('请选择购买的商品~', 2000)
+        }
       }
+
     }
 
 	}
